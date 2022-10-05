@@ -269,6 +269,19 @@ namespace SlimeVR {
 
                     break;
 
+                case CalibrationConfigType::QMI8658:
+                    m_Logger.info("            A_B        : %f, %f, %f", UNPACK_VECTOR_ARRAY(c.data.qmi8658.A_B));
+
+                    m_Logger.info("            A_Ainv     :");
+                    for (uint8_t i = 0; i < 3; i++) {
+                        m_Logger.info("                         %f, %f, %f", UNPACK_VECTOR_ARRAY(c.data.qmi8658.A_Ainv[i]));
+                    }
+
+                    m_Logger.info("            G_off      : %f, %f, %f", UNPACK_VECTOR_ARRAY(c.data.qmi8658.G_off));
+                    m_Logger.info("            Temperature: %f", c.data.qmi8658.temperature);
+
+                    break;
+                    
                 case CalibrationConfigType::ICM20948:
                     m_Logger.info("            G: %d, %d, %d", UNPACK_VECTOR_ARRAY(c.data.icm20948.G));
                     m_Logger.info("            A: %d, %d, %d", UNPACK_VECTOR_ARRAY(c.data.icm20948.A));

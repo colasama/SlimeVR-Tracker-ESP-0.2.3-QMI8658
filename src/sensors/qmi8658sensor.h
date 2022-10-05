@@ -1,6 +1,6 @@
 /*
     SlimeVR Code is placed under the MIT license
-    Copyright (c) 2022 TheDevMinerTV
+    Copyright (c) 2021 Eiren Rain & SlimeVR contributors
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -21,27 +21,32 @@
     THE SOFTWARE.
 */
 
-#include "CalibrationConfig.h"
+#ifndef SENSORS_QMI8658SENSOR_H
+#define SENSORS_QMI8658SENSOR_H
 
-namespace SlimeVR {
-    namespace Configuration {
-        const char* calibrationConfigTypeToString(CalibrationConfigType type) {
-            switch (type) {
-            case NONE:
-                return "NONE";
-            case BMI160:
-                return "BMI160";
-            case QMI8658:
-                return "QMI8658";
-            case MPU6050:
-                return "MPU6050";
-            case MPU9250:
-                return "MPU9250";
-            case ICM20948:
-                return "ICM20948";
-            default:
-                return "UNKNOWN";
-            }
-        }
-    }
-}
+#include "sensor.h"
+#include "mahony.h"
+#include "magneto1.4.h"
+
+#include <qmi8658.h>
+
+class QMI8658Sensor : public Sensor {
+    public:
+        QMI8658Sensor(uint8_t id, uint8_t address, float rotation) : Sensor("QMI8658Sensor", IMU_QMI8658, id, address, rotation){};
+        ~QMI8658Sensor(){};
+        void motionSetup() override final;
+        void motionLoop() override final;
+        void startCalibration(int calibrationType) override final;
+        void getScaledValues(float Gxyz[3], float Axyz[3]);
+        float getTemperature();
+    private:
+        QMI8658 imu {};
+        float q[4] {1.0f, 0.0f, 0.0f, 0.0f};
+        // Loop timing globals
+        uint32_t now = 0, last = 0;   //micros() timers
+        float deltat = 0;                  //loop time in seconds
+
+        SlimeVR::Configuration::QMI8658CalibrationConfig m_Calibration;
+};
+
+#endif
