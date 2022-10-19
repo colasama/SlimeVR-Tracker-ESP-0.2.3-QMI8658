@@ -131,7 +131,28 @@ void QMI8658Sensor::motionLoop() {
 
     float Gxyz[3] = {0};
     float Axyz[3] = {0};
-    getScaledValues(Gxyz, Axyz);
+    // getScaledValues(Gxyz, Axyz);
+    // 使用含校准的方法
+    
+    imu.getCalibratedData(Axyz, Gxyz);
+    Serial.printf("QMI8658 Calibrating...\n");
+    while(Axyz[0] == -1.0f) {
+        imu.getCalibratedData(Axyz, Gxyz);
+    }
+    Serial.printf("QMI8658 Calibrated!\n");
+    // 调试信息，先扔这里了
+    Serial.printf("\n");
+    Serial.printf("处理数据：\n");
+    Serial.printf("测量加速度(m/S^2):   [%2.4lf,%2.4lf,%2.4lf]\n", Axyz[0], Axyz[1], Axyz[2]);
+    Serial.printf("测量角速度(deg/s):   [%.4lf,%.4lf,%.4lf]\n", Gxyz[0], Gxyz[1], Gxyz[2]);
+    // Serial.printf("测量磁强度(Gauss):   [%.3lf,%.3lf,%.3lf]\n", mX/1500.0, mY/1500.0, mZ/1500.0);
+    // Serial.printf("提示：通常地磁场的强度是0.4-0.6 Gauss。\n");
+    //衡量磁感应强度大小的单位是Tesla或者Gauss（1Tesla=10000Gauss）。
+    //随着地理位置的不同，通常地磁场的强度是0.4-0.6 Gauss。
+    //量程2Guass的时候，增益系数为12 000，那么磁场值为hpx/12000（Guass）
+    //量程8Guass的时候，增益系数为1500，那么磁场值为hpx/1500（Guass）   大概？
+    //注意，磁场强度的单位为A/m，在空气中，A/m和高斯的转换关系为1高斯=79.62A/m，可以继续转换为磁场强度作为单位。
+    Serial.printf("\n");
 
     mahonyQuaternionUpdate(q, Axyz[0], Axyz[1], Axyz[2], Gxyz[0], Gxyz[1], Gxyz[2], deltat * 1.0e-6f);
     quaternion.set(-q[2], q[1], q[3], q[0]);

@@ -9,7 +9,20 @@
 #ifndef _QMI8658_H_
 
 #define _QMI8658_H_
+
+#define CALI_DATA_NUM	300
+
 #include <Arduino.h>
+
+typedef struct CaliData {
+	bool isCalibrated;
+	float accOffset[3];
+	float gyroOffset[3];
+	float accDataSum[3];
+	float gyroDataSum[3];
+	int caliNum;
+} CaliData;
+
 class QMI8658
 {
 public:
@@ -17,20 +30,20 @@ public:
   bool testConnection(void);
   bool initialize(void);
   void getMotion6(int16_t* ax, int16_t* ay, int16_t* az, int16_t* gx, int16_t* gy, int16_t* gz);
+  void getScaledMotion6(float acc[3], float gyro[3]);
   void getAcceleration(int16_t* ax, int16_t* ay, int16_t* az);
   void getRotation(int16_t* gx, int16_t* gy, int16_t* gz);
+  void getCalibratedData(float acc[3], float gyro[3]);
   int16_t getTemperature();
 
 public:
   int16_t ax, ay, az, gx, gy, gz;
   float pith, roll, yaw;
   unsigned long now, lastTime = 0;
-  float dt;      //微分时间
-  float agz = 0; //角度变量
-  long gzo = 0;  //陀螺仪偏移量
   
 private:
   uint8_t buffer[14];
+  CaliData cali;
 };
 
 /*----------------------------------------------------------------------------------------------
