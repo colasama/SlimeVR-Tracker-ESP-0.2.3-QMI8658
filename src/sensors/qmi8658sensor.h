@@ -27,7 +27,6 @@
 #include "sensor.h"
 #include "mahony.h"
 #include "magneto1.4.h"
-#include "madgwick.h"
 
 #include <qmi8658.h>
 

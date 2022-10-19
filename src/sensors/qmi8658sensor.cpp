@@ -30,9 +30,7 @@
 // 65.6 LSB/deg/s = 500 deg/s
 #define TYPICAL_SENSITIVITY_LSB 65.6
 #define ONE_G			(9.807f)
-#define ENABLE_CALIBRATION false
-#define SSVT_A 8192 // for 4G Sensibility
-#define SSVT_G 64 // for 512 dps
+
 // Scale conversion steps: LSB/°/s -> °/s -> step/°/s -> step/rad/s
 constexpr float GSCALE = ((32768. / TYPICAL_SENSITIVITY_LSB) / 32768.) * (PI / 180.0);
 
@@ -133,10 +131,28 @@ void QMI8658Sensor::motionLoop() {
 
     float Gxyz[3] = {0};
     float Axyz[3] = {0};
-    //getScaledValues(Gxyz, Axyz);
-    imu.getScaledMotion6(Axyz, Gxyz);
+    // getScaledValues(Gxyz, Axyz);
+    // 使用含校准的方法
+    
+    imu.getCalibratedData(Axyz, Gxyz);
+    while(Axyz[0] == -1.0f) {
+        imu.getCalibratedData(Axyz, Gxyz);
+    }
+    // // 调试信息，先扔这里了
+    // Serial.printf("处理数据：\n");
+    Serial.printf("\n");
+    Serial.printf("测量加速度(m/S^2):   [%2.4lf,%2.4lf,%2.4lf]\n", Axyz[0], Axyz[1], Axyz[2]);
+    Serial.printf("测量角速度(deg/s):   [%.4lf,%.4lf,%.4lf]\n", Gxyz[0], Gxyz[1], Gxyz[2]);
+    delay(400);
+    // Serial.printf("测量磁强度(Gauss):   [%.3lf,%.3lf,%.3lf]\n", mX/1500.0, mY/1500.0, mZ/1500.0);
+    // Serial.printf("提示：通常地磁场的强度是0.4-0.6 Gauss。\n");
+    //衡量磁感应强度大小的单位是Tesla或者Gauss（1Tesla=10000Gauss）。
+    //随着地理位置的不同，通常地磁场的强度是0.4-0.6 Gauss。
+    //量程2Guass的时候，增益系数为12 000，那么磁场值为hpx/12000（Guass）
+    //量程8Guass的时候，增益系数为1500，那么磁场值为hpx/1500（Guass）   大概？
+    //注意，磁场强度的单位为A/m，在空气中，A/m和高斯的转换关系为1高斯=79.62A/m，可以继续转换为磁场强度作为单位。
+
     mahonyQuaternionUpdate(q, Axyz[0], Axyz[1], Axyz[2], Gxyz[0], Gxyz[1], Gxyz[2], deltat * 1.0e-6f);
-    // madgwickQuaternionUpdate(q, Axyz[0], Axyz[1], Axyz[2], Gxyz[0], Gxyz[1], Gxyz[2], deltat * 1.0e-6f);
     quaternion.set(-q[2], q[1], q[3], q[0]);
     quaternion *= sensorOffset;
 
@@ -183,7 +199,7 @@ void QMI8658Sensor::getScaledValues(float Gxyz[3], float Axyz[3])
     int16_t gx, gy, gz;
     // TODO: Read from FIFO?
     imu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-#if ENABLE_CALIBRATION == true
+
     // TODO: Sensitivity over temp compensation?
     // TODO: Cross-axis sensitivity compensation?
     Gxyz[0] = ((float)gx - (m_Calibration.G_off[0] + (tempDiff * LSB_COMP_PER_TEMP_X_MAP[quant]))) * GSCALE;
@@ -205,14 +221,6 @@ void QMI8658Sensor::getScaledValues(float Gxyz[3], float Axyz[3])
         for (uint8_t i = 0; i < 3; i++)
             Axyz[i] = (Axyz[i] - calibration->A_B[i]);
     #endif
-#else
-    Gxyz[0] = (float)gx * GSCALE;
-    Gxyz[1] = (float)gy * GSCALE;
-    Gxyz[2] = (float)gz * GSCALE;
-    Axyz[0] = (float)ax;
-    Axyz[1] = (float)ay;
-    Axyz[2] = (float)az;
-#endif
 }
 
 void QMI8658Sensor::startCalibration(int calibrationType) {
