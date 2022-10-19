@@ -129,12 +129,18 @@ void QMI8658::getCalibratedData(float acc[3], float gyro[3]) {
                     cali.accDataSum[axis] += acc_raw[axis];
                 }
             }
+			// Serial.printf("加速度原始值:   [%2.4lf,%2.4lf,%2.4lf]\n", acc_raw[0], acc_raw[1], acc_raw[2]);
+			// Serial.printf("陀螺仪原始值:   [%2.4lf,%2.4lf,%2.4lf]\n", gyro_raw[0], gyro_raw[1], gyro_raw[2]);
         }
         else if(cali.caliNum == CALI_DATA_NUM) {
+			// Serial.printf("加速度累计偏移值:   [%2.4lf,%2.4lf,%2.4lf]\n", cali.accDataSum[0], cali.accDataSum[1], cali.accDataSum[2]);
+			// Serial.printf("陀螺仪累计偏移值:   [%2.4lf,%2.4lf,%2.4lf]\n", cali.gyroDataSum[0], cali.gyroDataSum[1], cali.gyroDataSum[2]);
             for(axis = 0; axis < 3; axis++) {
                 cali.gyroOffset[axis] = (0.0f - (cali.gyroDataSum[axis] / (CALI_DATA_NUM - 1)));
-                cali.gyroOffset[axis] = (0.0f - (cali.accDataSum[axis] / (CALI_DATA_NUM - 1)));
+                cali.accOffset[axis] = (0.0f - (cali.accDataSum[axis] / (CALI_DATA_NUM - 1)));
             }
+			Serial.printf("加速度计偏移值：[%.5f, %.5f, %.5f]\n", cali.accOffset[0], cali.accOffset[1], cali.accOffset[2]);
+			Serial.printf("陀螺仪偏移值：[%.5f, %.5f, %.5f]\n", cali.gyroOffset[0], cali.gyroOffset[1], cali.gyroOffset[2]);
             cali.isCalibrated = true;
         }
 		// 校准次数加一

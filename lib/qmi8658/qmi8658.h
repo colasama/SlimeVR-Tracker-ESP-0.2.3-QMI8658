@@ -10,7 +10,7 @@
 
 #define _QMI8658_H_
 
-#define CALI_DATA_NUM	300
+#define CALI_DATA_NUM	1000
 
 #include <Arduino.h>
 
