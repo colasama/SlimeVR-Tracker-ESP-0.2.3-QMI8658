@@ -13,6 +13,7 @@
 #define CALI_DATA_NUM	1000
 
 #include <Arduino.h>
+#include "../../src/defines.h"
 
 typedef struct CaliData {
 	bool isCalibrated;
@@ -50,7 +51,11 @@ private:
   QMI8658 UI Sensor Configuration Settings and Output Data
 */
 ///<Configuration Registers>
+#if SECOND_IMU == IMU_QMI8658
+#define ADDRESS 0X6A  //device address
+#else
 #define ADDRESS 0X6B  //device address
+#endif
 #define WHO_AM_I 0X00 //Device identifier
 #define CTRL1 0x02    //Serial Interface and Sensor Enable
 #define CTRL2 0x03    //Accelerometer Settings

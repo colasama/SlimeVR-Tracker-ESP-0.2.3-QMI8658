@@ -26,11 +26,11 @@
 // ================================================
 
 // Set parameters of IMU and board used
-#define IMU IMU_QMI8658
-#define SECOND_IMU IMU
+#define IMU IMU_MPU6050
+#define SECOND_IMU IMU_QMI8658
 #define BOARD BOARD_NODEMCU
-#define IMU_ROTATION DEG_90
-#define SECOND_IMU_ROTATION DEG_270
+#define IMU_ROTATION DEG_0
+#define SECOND_IMU_ROTATION DEG_90
 
 // Battery monitoring options (comment to disable):
 //   BAT_EXTERNAL for ADC pin, 
@@ -43,9 +43,9 @@
 // For other boards you can now adjust the other resistor values.
 // The diagram looks like this:
 //   (Battery)--- [BATTERY_SHIELD_RESISTANCE] ---(INPUT_BOARD)---  [BATTERY_SHIELD_R2] ---(ESP32_INPUT)--- [BATTERY_SHIELD_R1] --- (GND)
-#define BATTERY_SHIELD_RESISTANCE 180 //130k BatteryShield, 180k SlimeVR or fill in external resistor value in kOhm
-// #define BATTERY_SHIELD_R1 100 // Board voltage divider resistor Ain to GND in kOhm
-// #define BATTERY_SHIELD_R2 220 // Board voltage divider resistor Ain to INPUT_BOARD in kOhm
+#define BATTERY_SHIELD_RESISTANCE 0 //130k BatteryShield, 180k SlimeVR or fill in external resistor value in kOhm
+#define BATTERY_SHIELD_R1 16 // Board voltage divider resistor Ain to GND in kOhm
+#define BATTERY_SHIELD_R2 50 // Board voltage divider resistor Ain to INPUT_BOARD in kOhm
 
 // LED configuration:
 // Configuration Priority 1 = Highest:
@@ -78,8 +78,8 @@
   #define LED_INVERTED true
 #elif BOARD == BOARD_NODEMCU || BOARD == BOARD_WEMOSD1MINI
   #define PIN_IMU_SDA D2 // Modified to Linhua 2.2
-  #define PIN_IMU_SCL D3
-  #define PIN_IMU_INT D1
+  #define PIN_IMU_SCL D1
+  #define PIN_IMU_INT D5
   #define PIN_IMU_INT_2 D6
   #define PIN_BATTERY_LEVEL A0
 //  #define LED_PIN 2

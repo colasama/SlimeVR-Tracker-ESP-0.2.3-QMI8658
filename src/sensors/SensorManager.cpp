@@ -50,7 +50,7 @@ namespace SlimeVR
 #elif IMU == IMU_MPU9250 || IMU == IMU_BMI160 || IMU == IMU_MPU6500 || IMU == IMU_MPU6050 || IMU == IMU_ICM20948
                 firstIMUAddress = I2CSCAN::pickDevice(0x68, 0x69, true);
 #elif IMU == IMU_QMI8658
-                firstIMUAddress = I2CSCAN::pickDevice(0x6B, 0x6C, true);
+                firstIMUAddress = I2CSCAN::pickDevice(0x6B, 0x6A, true);
 #else
 #error Unsupported primary IMU
 #endif
@@ -90,8 +90,8 @@ namespace SlimeVR
                 secondIMUAddress = I2CSCAN::pickDevice(0x28, 0x29, false);
 #elif SECOND_IMU == IMU_MPU9250 || SECOND_IMU == IMU_BMI160 || SECOND_IMU == IMU_MPU6500 || SECOND_IMU == IMU_MPU6050 || SECOND_IMU == IMU_ICM20948
                 secondIMUAddress = I2CSCAN::pickDevice(0x69, 0x68, false);
-#elif IMU == IMU_QMI8658
-                firstIMUAddress = I2CSCAN::pickDevice(0x6C, 0x6B, false);
+#elif SECOND_IMU == IMU_QMI8658
+                secondIMUAddress = I2CSCAN::pickDevice(0x6A, 0x6B, true);
 #else
 #error Unsupported secondary IMU
 #endif
