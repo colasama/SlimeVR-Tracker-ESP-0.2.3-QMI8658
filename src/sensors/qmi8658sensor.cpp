@@ -30,9 +30,7 @@
 // 65.6 LSB/deg/s = 500 deg/s
 #define TYPICAL_SENSITIVITY_LSB 65.6
 #define ONE_G			(9.807f)
-#define ENABLE_CALIBRATION false
-#define SSVT_A 8192 // for 4G Sensibility
-#define SSVT_G 64 // for 512 dps
+
 // Scale conversion steps: LSB/°/s -> °/s -> step/°/s -> step/rad/s
 constexpr float GSCALE = ((32768. / TYPICAL_SENSITIVITY_LSB) / 32768.) * (PI / 180.0);
 
@@ -133,10 +131,9 @@ void QMI8658Sensor::motionLoop() {
 
     float Gxyz[3] = {0};
     float Axyz[3] = {0};
-    //getScaledValues(Gxyz, Axyz);
-    imu.getScaledMotion6(Axyz, Gxyz);
+    getScaledValues(Gxyz, Axyz);
+
     mahonyQuaternionUpdate(q, Axyz[0], Axyz[1], Axyz[2], Gxyz[0], Gxyz[1], Gxyz[2], deltat * 1.0e-6f);
-    // madgwickQuaternionUpdate(q, Axyz[0], Axyz[1], Axyz[2], Gxyz[0], Gxyz[1], Gxyz[2], deltat * 1.0e-6f);
     quaternion.set(-q[2], q[1], q[3], q[0]);
     quaternion *= sensorOffset;
 
@@ -183,7 +180,7 @@ void QMI8658Sensor::getScaledValues(float Gxyz[3], float Axyz[3])
     int16_t gx, gy, gz;
     // TODO: Read from FIFO?
     imu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-#if ENABLE_CALIBRATION == true
+
     // TODO: Sensitivity over temp compensation?
     // TODO: Cross-axis sensitivity compensation?
     Gxyz[0] = ((float)gx - (m_Calibration.G_off[0] + (tempDiff * LSB_COMP_PER_TEMP_X_MAP[quant]))) * GSCALE;
@@ -205,14 +202,6 @@ void QMI8658Sensor::getScaledValues(float Gxyz[3], float Axyz[3])
         for (uint8_t i = 0; i < 3; i++)
             Axyz[i] = (Axyz[i] - calibration->A_B[i]);
     #endif
-#else
-    Gxyz[0] = (float)gx * GSCALE;
-    Gxyz[1] = (float)gy * GSCALE;
-    Gxyz[2] = (float)gz * GSCALE;
-    Axyz[0] = (float)ax;
-    Axyz[1] = (float)ay;
-    Axyz[2] = (float)az;
-#endif
 }
 
 void QMI8658Sensor::startCalibration(int calibrationType) {
