@@ -75,7 +75,7 @@
 
 // Send inspection packets over the network to a profiler
 // Not recommended for production
-#define ENABLE_INSPECTION false
+#define ENABLE_INSPECTION true  //启用网络发送debug数据包->server 功能
 
 #define FIRMWARE_BUILD_NUMBER 12
 #define FIRMWARE_VERSION "0.2.3"

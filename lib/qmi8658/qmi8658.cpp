@@ -98,10 +98,11 @@ uint8_t QMI8658::getDeviceID()
 	return chip_id;
 }
 
-// 虚假的testConnection
+
 bool QMI8658::testConnection()
 {
-	return getDeviceID();
+	uint8_t deviceId = getDeviceID();
+    return deviceId == 0x05; // QMI8658
 }
 
 // 校准
@@ -156,8 +157,21 @@ void QMI8658::getCalibratedData(float acc[3], float gyro[3]) {
 		}
 	}
 }
-// 获取温度，尚未编写
+
+/*获取温度
+Table 18. Temperature Sensor Specifications
+Subsystem 	|Parameter 				|Typical 	|Unit
+Digital		|Range					|40 to +85 	|°C
+Temperature	|Internal Resolution 	|16 		|Bits	
+Sensor		|Internal Sensitivity 	|256 		|LSB/°C
+			|Output Register Width 	|16 		|Bits
+			|Output Sensitivity 	|256 		|LSB/°C
+			|Refresh Rate 			|8 			|Hz				
+*/
 int16_t QMI8658::getTemperature()
 {
-	return 0;
+	uint8_t TEMP_l = I2Cdev::readBytes(ADDRESS, TEMP_L, 1, &TEMP_l);
+	unit8_t TEMP_h = I2Cdev::readBytes(ADDRESS, TEMP_H, 1, &TEMP_h);
+	//T = TEMP_H + (TEMP_L / 256)
+	return TEMP_h+(TEMP_l/256);
 }

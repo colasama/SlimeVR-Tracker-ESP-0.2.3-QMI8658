@@ -169,15 +169,6 @@ void QMI8658Sensor::motionLoop() {
     }
 }
 
-float QMI8658Sensor::getTemperature()
-{
-    // Middle value is 23 degrees C (0x0000)
-    // #define TEMP_ZERO 23
-    // Temperature per step from -41 + 1/2^9 degrees C (0x8001) to 87 - 1/2^9 degrees C (0x7FFF)
-    // constexpr float TEMP_STEP = 128. / 65535;
-    // return (imu.getTemperature() * TEMP_STEP) + TEMP_ZERO;
-    return (readBytes(cmd[3]) / 256) - 5.2;
-}
 
 void QMI8658Sensor::getScaledValues(float Gxyz[3], float Axyz[3])
 {
@@ -191,7 +182,7 @@ void QMI8658Sensor::getScaledValues(float Gxyz[3], float Axyz[3])
     }
 #endif
 
-    float temperature = getTemperature();
+    float temperature = imu.getTemperature();
     float tempDiff = temperature - m_Calibration.temperature;
     uint8_t quant = map(temperature, 15, 75, 0, 12);
 
@@ -231,7 +222,7 @@ void QMI8658Sensor::startCalibration(int calibrationType) {
     // Wait for sensor to calm down before calibration
     m_Logger.info("Put down the device and wait for baseline gyro reading calibration");
     delay(2000);
-    float temperature = getTemperature();
+    float temperature = imu.getTemperature();
     m_Calibration.temperature = temperature;
     uint16_t gyroCalibrationSamples = 2500;
     float rawGxyz[3] = {0};

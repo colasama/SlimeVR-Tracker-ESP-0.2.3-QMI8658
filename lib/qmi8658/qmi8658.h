@@ -73,6 +73,7 @@ private:
 #define AccZ_L 0x39
 #define AccZ_H 0x3A
 #define TEMP_L 0x33
+#define TEMP_H 0X34
 
 #define GyrX_L 0x3B
 #define GyrX_H 0x3C
