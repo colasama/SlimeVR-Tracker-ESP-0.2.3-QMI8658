@@ -14,6 +14,7 @@
 
 #include <Arduino.h>
 #include "../../src/defines.h"
+#include <quat.h>
 
 typedef struct CaliData {
 	bool isCalibrated;
@@ -35,11 +36,14 @@ public:
   void getAcceleration(int16_t* ax, int16_t* ay, int16_t* az);
   void getRotation(int16_t* gx, int16_t* gy, int16_t* gz);
   void getCalibratedData(float acc[3], float gyro[3]);
+  void getQuaternion(float *q1, float *q2, float *q3, float *q4);
+  void getEularAngle(float *roll, float *pitch, float *yaw);
   int16_t getTemperature();
 
 public:
   int16_t ax, ay, az, gx, gy, gz;
-  float pith, roll, yaw;
+  float q[4] {1.0f, 0.0f, 0.0f, 0.0f};
+  float pitch, roll, yaw;
   unsigned long now, lastTime = 0;
   
 private:
@@ -51,20 +55,26 @@ private:
   QMI8658 UI Sensor Configuration Settings and Output Data
 */
 ///<Configuration Registers>
-#if SECOND_IMU == IMU_QMI8658
-#define ADDRESS 0X6A  //device address
-#else
-#define ADDRESS 0X6B  //device address
-#endif
+// TODO: 目前无法同时使用两个8658，需要修复
+// #if SECOND_IMU == IMU_QMI8658
+// #define ADDRESS 0X6B  //device address
+// #else
+// #define ADDRESS 0X6B  //device address
+// #endif
+#define ADDRESS 0X6B
 #define WHO_AM_I 0X00 //Device identifier
 #define CTRL1 0x02    //Serial Interface and Sensor Enable
 #define CTRL2 0x03    //Accelerometer Settings
 #define CTRL3 0x04    //Gyroscope Settings
-#define CTRL4 0X05    //Magnetometer Settings
-#define CTRL5 0X06    //Sensor Data Processing Settings
+#define CTRL4 0x05    //Magnetometer Settings
+#define CTRL5 0x06    //Sensor Data Processing Settings
+#define CTRL6 0x07    //Motion on Demand & Attitude Engine ODR Settings
 #define CTRL7 0x08    //Enable Sensors and Configure Data Reads
-#define CTRL8 0X09    //Reserved – Special Settings
+#define CTRL8 0x09    //Reserved – Special Settings
 
+///<Attitude Engine Registers>
+#define AE_REG1 0x57
+#define AE_REG2 0x58
 ///<Sensor Data Output Registers>
 #define AccX_L 0x35
 #define AccX_H 0x36
@@ -80,6 +90,22 @@ private:
 #define GyrY_H 0x3E
 #define GyrZ_L 0x3F
 #define GyrZ_H 0x40
+
+#define dQW_L 0x49
+#define dQW_H 0x4A
+#define dQX_L 0x4B
+#define dQX_H 0x4C
+#define dQY_L 0x4D
+#define dQY_H 0x4E
+#define dQZ_L 0x4F
+#define dQZ_H 0x50
+
+#define dVX_L 0x51
+#define dVX_H 0x52
+#define dVY_L 0x53
+#define dVY_H 0x54
+#define dVZ_L 0x55
+#define dVZ_H 0x56
 int16_t readBytes(unsigned char tmp);
 //extern QMI8658 _QMI8658;
 #endif

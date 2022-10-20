@@ -143,6 +143,11 @@ void QMI8658Sensor::motionLoop() {
     Serial.printf("\n");
     Serial.printf("测量加速度(m/S^2):   [%2.4lf,%2.4lf,%2.4lf]\n", Axyz[0], Axyz[1], Axyz[2]);
     Serial.printf("测量角速度(deg/s):   [%.4lf,%.4lf,%.4lf]\n", Gxyz[0], Gxyz[1], Gxyz[2]);
+    float qw, qx, qy, qz, er, ep, ey;
+    imu.getQuaternion(&qw, &qx, &qy, &qz);
+    imu.getEularAngle(&er, &ep, &ey);
+    Serial.printf("AE四元数:   [%.4lf,%.4lf,%.4lf,%.4lf]\n", qw, qx, qy, qz);
+    Serial.printf("AE欧拉角:   [%.2lf,%.2lf,%.2lf]\n",er, ep ,ey);
     delay(400);
     // Serial.printf("测量磁强度(Gauss):   [%.3lf,%.3lf,%.3lf]\n", mX/1500.0, mY/1500.0, mZ/1500.0);
     // Serial.printf("提示：通常地磁场的强度是0.4-0.6 Gauss。\n");
