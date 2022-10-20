@@ -2,8 +2,8 @@
  * @Description: QMI8658
  * @Author: ELEGOO
  * @Date: 2019-07-10 16:46:17
- * @LastEditTime: 2021-04-23 15:08:40
- * @LastEditors: Changhua
+ * @LastEditTime: 2022-10-20 11:39:22
+ * @LastEditors: Colanns
  */
 #include "QMI8658.h"
 #include "I2Cdev.h"

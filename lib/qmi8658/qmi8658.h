@@ -2,8 +2,8 @@
  * @Description: QMI8658
  * @Author: ELEGOO
  * @Date: 2019-07-10 16:46:17
- * @LastEditTime: 2021-04-14 14:05:33
- * @LastEditors: Changhua
+ * @LastEditTime: 2022-10-20 11:39:22
+ * @LastEditors: Colanns
  */
 
 #ifndef _QMI8658_H_
