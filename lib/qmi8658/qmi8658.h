@@ -142,7 +142,7 @@ private:
 #define AE_REG2 58
  
 //Reset Register
-#defien RESET 0x60 //Soft Reset Register
+#define RESET 0x60 //Soft Reset Register
 
 int16_t readBytes(unsigned char tmp);
 //extern QMI8658 _QMI8658;
