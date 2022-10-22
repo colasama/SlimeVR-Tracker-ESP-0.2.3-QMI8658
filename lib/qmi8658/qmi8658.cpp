@@ -171,7 +171,7 @@ Sensor		|Internal Sensitivity 	|256 		|LSB/°C
 int16_t QMI8658::getTemperature()
 {
 	uint8_t TEMP_l = I2Cdev::readBytes(ADDRESS, TEMP_L, 1, &TEMP_l);
-	uint8_t TEMP_h = I2Cdev::readBytes(ADDRESS, TEMP_H, 1, &TEMP_h);
+	unit8_t TEMP_h = I2Cdev::readBytes(ADDRESS, TEMP_H, 1, &TEMP_h);
 	//T = TEMP_H + (TEMP_L / 256)
 	return TEMP_h+(TEMP_l/256);
 }
