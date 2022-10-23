@@ -27,8 +27,10 @@
 #include "sensor.h"
 #include "mahony.h"
 #include "magneto1.4.h"
+#include "madgwick.h"
 
 #include <qmi8658.h>
+#include <QMC5883L.h>
 
 class QMI8658Sensor : public Sensor {
     public:
@@ -41,6 +43,7 @@ class QMI8658Sensor : public Sensor {
         float getTemperature();
     private:
         QMI8658 imu {};
+        QMC5883L mag;
         float q[4] {1.0f, 0.0f, 0.0f, 0.0f};
         // Loop timing globals
         uint32_t now = 0, last = 0;   //micros() timers

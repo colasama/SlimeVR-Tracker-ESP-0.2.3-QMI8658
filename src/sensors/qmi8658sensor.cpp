@@ -63,6 +63,7 @@ void QMI8658Sensor::motionSetup() {
     // initialize device
     // imu.initialize(addr);
     imu.initialize();
+    mag.init();
     if(!imu.testConnection()) {
         m_Logger.fatal("Can't connect to QMI8658 (reported device ID 0x%02x) at address 0x%02x", imu.getDeviceID(), addr);
         ledManager.pattern(50, 50, 200);
@@ -139,18 +140,15 @@ void QMI8658Sensor::motionLoop() {
         imu.getCalibratedData(Axyz, Gxyz);
     }
     // // 调试信息，先扔这里了
-    // Serial.printf("处理数据：\n");
+    Serial.printf("处理数据：\n");
     Serial.printf("\n");
     Serial.printf("测量加速度(m/S^2):   [%2.4lf,%2.4lf,%2.4lf]\n", Axyz[0], Axyz[1], Axyz[2]);
     Serial.printf("测量角速度(deg/s):   [%.4lf,%.4lf,%.4lf]\n", Gxyz[0], Gxyz[1], Gxyz[2]);
-    float qw, qx, qy, qz, er, ep, ey;
-    imu.getQuaternion(&qw, &qx, &qy, &qz);
-    imu.getEularAngle(&er, &ep, &ey);
-    Serial.printf("AE四元数:   [%.4lf,%.4lf,%.4lf,%.4lf]\n", qw, qx, qy, qz);
-    Serial.printf("AE欧拉角:   [%.2lf,%.2lf,%.2lf]\n",er, ep ,ey);
+    int16_t mx, my, mz, mt;
+    mag.readRaw(&mx, &my, &mz, &mt);
     delay(400);
-    // Serial.printf("测量磁强度(Gauss):   [%.3lf,%.3lf,%.3lf]\n", mX/1500.0, mY/1500.0, mZ/1500.0);
-    // Serial.printf("提示：通常地磁场的强度是0.4-0.6 Gauss。\n");
+    Serial.printf("测量磁强度(Gauss):   [%.4lf,%.4lf,%.4lf]\n", mx/1500, my/1500, mz/1500);
+    Serial.printf("提示：通常地磁场的强度是0.4-0.6 Gauss。\n");
     //衡量磁感应强度大小的单位是Tesla或者Gauss（1Tesla=10000Gauss）。
     //随着地理位置的不同，通常地磁场的强度是0.4-0.6 Gauss。
     //量程2Guass的时候，增益系数为12 000，那么磁场值为hpx/12000（Guass）
@@ -158,6 +156,7 @@ void QMI8658Sensor::motionLoop() {
     //注意，磁场强度的单位为A/m，在空气中，A/m和高斯的转换关系为1高斯=79.62A/m，可以继续转换为磁场强度作为单位。
 
     mahonyQuaternionUpdate(q, Axyz[0], Axyz[1], Axyz[2], Gxyz[0], Gxyz[1], Gxyz[2], deltat * 1.0e-6f);
+    // madgwickQuaternionUpdate(q, Axyz[0], Axyz[1], Axyz[2], Gxyz[0], Gxyz[1], Gxyz[2], deltat * 1.0e-6f);
     quaternion.set(-q[2], q[1], q[3], q[0]);
     quaternion *= sensorOffset;
 
