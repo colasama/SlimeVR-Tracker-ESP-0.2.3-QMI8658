@@ -7,6 +7,7 @@
  */
 #include "qmi8658.h"
 #include "I2Cdev.h"
+#include "qmc5883l.h"
 
 const uint8_t cmd[] = {AccX_L, AccY_L, AccZ_L, TEMP_L, GyrX_L, GyrY_L, GyrZ_L};
 #define QFABS(x) (((x) < 0.0f) ? (-1.0f * (x)) : (x))
@@ -224,13 +225,4 @@ int16_t QMI8658::getTemperature()
 {
 	uint8_t TEMP[2];I2Cdev::readBytes(ADDRESS, TEMP_L, 2, TEMP);
 	return ((TEMP[1] << 8) | TEMP[0]);
-}
-
-void QMI8658::getMotion9(int16_t* ax, int16_t* ay, int16_t* az, int16_t* gx, int16_t* gy, int16_t* gz, int16_t* mx, int16_t* my, int16_t* mz) {
-
-	//get accel and gyro
-	getMotion6(ax, ay, az, gx, gy, gz);
-
-	// read mag
-	readRaw(mx, my, mz);
 }

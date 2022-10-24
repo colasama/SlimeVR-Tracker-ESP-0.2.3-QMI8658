@@ -1,6 +1,6 @@
 #include <Wire.h>
 #include <math.h>
-#include "QMC5883L.h"
+#include "qmc5883l.h"
 
 /*
  * QMC5883L
@@ -148,7 +148,7 @@ void QMC5883L::setSamplingRate( int x )
   reconfig();
 }
 
-void QMC5883L::init() {
+void QMC5883L::initialize() {
   /* This assumes the wire library has been initialized. */
   addr = QMC5883L_ADDR;
   oversampling = QMC5883L_CONFIG_OS512;
@@ -170,9 +170,9 @@ int QMC5883L::ready()
 }
 
 //重载一个不需要变量t的函数
-void QMC5883L::readRaw( int16_t *x, int16_t *y, int16_t *z)
+void QMC5883L::getMagetometerData( int16_t *x, int16_t *y, int16_t *z)
 {
-  while(!ready()) {}
+  // while(!ready()) {}
   *x = readBytes(addr, QMC5883L_X_LSB);
   *y = readBytes(addr, QMC5883L_Y_LSB);
   *z = readBytes(addr, QMC5883L_Z_LSB);
@@ -195,7 +195,7 @@ int QMC5883L::readHeading()
   int16_t x, y, z;
 
   // if(!readRaw(&x,&y,&z)) return 0;
-    readRaw(&x,&y,&z);
+    getMagetometerData(&x,&y,&z);
 
   /* Update the observed boundaries of the measurements */
 

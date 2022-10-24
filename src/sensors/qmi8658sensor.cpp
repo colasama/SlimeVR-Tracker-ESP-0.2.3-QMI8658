@@ -55,7 +55,7 @@ void QMI8658Sensor::motionSetup() {
     // initialize device
     // imu.initialize(addr);
     imu.initialize();
-    mag.init();
+    mag.initialize();
     if(!imu.testConnection()) {
         m_Logger.fatal("Can't connect to QMI8658 (reported device ID 0x%02x) at address 0x%02x", imu.getDeviceID(), addr);
         ledManager.pattern(50, 50, 200);
@@ -158,8 +158,15 @@ void QMI8658Sensor::motionLoop() {
     // Serial.printf("AE四元数:   [%.4lf,%.4lf,%.4lf,%.4lf]\n", qw, qx, qy, qz);
     // Serial.printf("AE欧拉角:   [%.2lf,%.2lf,%.2lf]\n",er, ep ,ey);
     // delay(400);
-    // // Serial.printf("测量磁强度(Gauss):   [%.3lf,%.3lf,%.3lf]\n", mX/1500.0, mY/1500.0, mZ/1500.0);
-    // // Serial.printf("提示：通常地磁场的强度是0.4-0.6 Gauss。\n");
+
+    /* 磁强度测试 */
+    // int16_t mxt, myt, mzt;
+    // mag.getMagetometerData(&mxt, &myt, &mzt);
+
+    // Serial.printf("测量磁强度(Gauss):   [%.3lf,%.3lf,%.3lf]\n", mxt/1500.0, myt/1500.0, mzt/1500.0);
+    // Serial.printf("提示：通常地磁场的强度是0.4-0.6 Gauss。\n");
+    // delay(400);
+
     // //衡量磁感应强度大小的单位是Tesla或者Gauss（1Tesla=10000Gauss）。
     // //随着地理位置的不同，通常地磁场的强度是0.4-0.6 Gauss。
     // //量程2Guass的时候，增益系数为12 000，那么磁场值为hpx/12000（Guass）
@@ -195,7 +202,8 @@ void QMI8658Sensor::getMPUScaled()
 #if defined(_MAHONY_H_) || defined(_MADGWICK_H_)
     int16_t ax, ay, az, gx, gy, gz, mx, my, mz;
     //TODO:qmi8658还没有加磁力计，目前没有getMotion9这个函数
-    imu.getMotion9(&ax, &ay, &az, &gx, &gy, &gz, &mx, &my, &mz);
+    imu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+    mag.getMagetometerData(&mx, &my, &mz);
     Gxyz[0] = ((float)gx - m_Calibration.G_off[0]) * gscale; //250 LSB(d/s) default to radians/s
     Gxyz[1] = ((float)gy - m_Calibration.G_off[1]) * gscale;
     Gxyz[2] = ((float)gz - m_Calibration.G_off[2]) * gscale;
@@ -238,7 +246,8 @@ void QMI8658Sensor::startCalibration(int calibrationType) {
     for (int i = 0; i < calibrationSamples; i++)
     {
         int16_t ax,ay,az,gx,gy,gz,mx,my,mz;
-        imu.getMotion9(&ax, &ay, &az, &gx, &gy, &gz, &mx, &my, &mz);
+        imu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+        mag.getMagetometerData(&mx, &my, &mz);
         Gxyz[0] += float(gx);
         Gxyz[1] += float(gy);
         Gxyz[2] += float(gz);
@@ -264,7 +273,8 @@ void QMI8658Sensor::startCalibration(int calibrationType) {
     for (int i = 0; i < calibrationSamples; i++) {
         ledManager.on();
         int16_t ax,ay,az,gx,gy,gz,mx,my,mz;
-        imu.getMotion9(&ax, &ay, &az, &gx, &gy, &gz, &mx, &my, &mz);
+        imu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+        mag.getMagetometerData(&mx, &my, &mz);
         calibrationDataAcc[i * 3 + 0] = ax;
         calibrationDataAcc[i * 3 + 1] = ay;
         calibrationDataAcc[i * 3 + 2] = az;

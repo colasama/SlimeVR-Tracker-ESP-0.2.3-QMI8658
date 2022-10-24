@@ -45,6 +45,8 @@
 #define BOARD_ESP01 8
 #define BOARD_SLIMEVR 9
 #define BOARD_LOLIN_C3_MINI 10
+#define BOARD_SAKURA 11
+#define BOARD_LINHUA22 12
 
 #define BAT_EXTERNAL 1
 #define BAT_INTERNAL 2

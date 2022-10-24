@@ -30,7 +30,7 @@
 // #include "magneto1.4.h"//这个是什么算法，干啥的好复杂
 
 #include "qmi8658.h"
-#include <QMC5883L.h>
+#include <qmc5883l.h>
 
 class QMI8658Sensor : public Sensor {
     public:

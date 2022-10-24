@@ -6,14 +6,15 @@
 
 class QMC5883L {
 public:
-  void init();
+  void initialize();
   void reset();
   int  ready();
   void reconfig();
   
   int readHeading();
 
-  void readRaw( int16_t *x, int16_t *y, int16_t *z);
+  // Raw mag data
+  void getMagetometerData( int16_t *mx, int16_t *my, int16_t *mz);
 
   void resetCalibration();
 
