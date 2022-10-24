@@ -42,9 +42,11 @@
     #define DEBUG_SENSOR
     #define DEBUG_NETWORK
     #define DEBUG_CONFIGURATION
+#elif LOG_LEVEL == LOG_LEVEL_DEBUG
+    #define DEBUG_CONFIGURATION//debug模式输出校准矩阵方便观察
 #endif
 
-#define serialDebug false // Set to true to get Serial output for debugging
+#define serialDebug true // Set to true to get Serial output for debugging启用串口输出debug信息
 #define serialBaudRate 115200
 #define LED_INTERVAL_STANDBY 10000
 
@@ -75,7 +77,7 @@
 
 // Send inspection packets over the network to a profiler
 // Not recommended for production
-#define ENABLE_INSPECTION false
+#define ENABLE_INSPECTION false//发送debug信息（原始加速度，陀螺仪，磁力计）到server，不建议打开会报错
 
 #define FIRMWARE_BUILD_NUMBER 12
 #define FIRMWARE_VERSION "0.2.3"

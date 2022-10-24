@@ -5,7 +5,7 @@
  * @LastEditTime: 2022-10-20 11:39:22
  * @LastEditors: Colanns
  */
-#include "QMI8658.h"
+#include "qmi8658.h"
 #include "I2Cdev.h"
 
 const uint8_t cmd[] = {AccX_L, AccY_L, AccZ_L, TEMP_L, GyrX_L, GyrY_L, GyrZ_L};
@@ -139,10 +139,10 @@ uint8_t QMI8658::getDeviceID()
 	return chip_id;
 }
 
-// 虚假的testConnection
+// 应该有用的testConnection
 bool QMI8658::testConnection()
 {
-	return getDeviceID();
+	return getDeviceID()==0x05;//QMI8658
 }
 
 // 校准
@@ -208,8 +208,29 @@ void QMI8658::getCalibratedData(float acc[3], float gyro[3])
 		}
 	}
 }
-// 获取温度，尚未编写
+
+/*获取温度
+Table 18. Temperature Sensor Specifications
+Subsystem 	|Parameter 				|Typical 	|Unit
+Digital		|Range					|40 to +85 	|°C
+Temperature	|Internal Resolution 	|16 		|Bits	
+Sensor		|Internal Sensitivity 	|256 		|LSB/°C
+			|Output Register Width 	|16 		|Bits
+			|Output Sensitivity 	|256 		|LSB/°C
+			|Refresh Rate 			|8 			|Hz				
+*/
+//这里输出原始数据，用法T = TEMP / 256 摄氏度，精度为1/16度
 int16_t QMI8658::getTemperature()
 {
-	return 0;
+	uint8_t TEMP[2];I2Cdev::readBytes(ADDRESS, TEMP_L, 2, TEMP);
+	return ((TEMP[1] << 8) | TEMP[0]);
+}
+
+void QMI8658::getMotion9(int16_t* ax, int16_t* ay, int16_t* az, int16_t* gx, int16_t* gy, int16_t* gz, int16_t* mx, int16_t* my, int16_t* mz) {
+
+	//get accel and gyro
+	getMotion6(ax, ay, az, gx, gy, gz);
+
+	// read mag
+	readRaw(mx, my, mz);
 }

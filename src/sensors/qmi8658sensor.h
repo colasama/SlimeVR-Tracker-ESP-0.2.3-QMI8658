@@ -25,10 +25,12 @@
 #define SENSORS_QMI8658SENSOR_H
 
 #include "sensor.h"
-#include "mahony.h"
-#include "magneto1.4.h"
+#include "logging/Logger.h"
 
-#include <qmi8658.h>
+// #include "magneto1.4.h"//这个是什么算法，干啥的好复杂
+
+#include "qmi8658.h"
+#include <QMC5883L.h>
 
 class QMI8658Sensor : public Sensor {
     public:
@@ -37,16 +39,30 @@ class QMI8658Sensor : public Sensor {
         void motionSetup() override final;
         void motionLoop() override final;
         void startCalibration(int calibrationType) override final;
-        void getScaledValues(float Gxyz[3], float Axyz[3]);
-        float getTemperature();
+        void getMPUScaled();
     private:
         QMI8658 imu {};
-        float q[4] {1.0f, 0.0f, 0.0f, 0.0f};
-        // Loop timing globals
-        uint32_t now = 0, last = 0;   //micros() timers
-        float deltat = 0;                  //loop time in seconds
+        QMC5883L mag;
 
-        SlimeVR::Configuration::QMI8658CalibrationConfig m_Calibration;
+        //抄9250的有些可能用不到
+        uint8_t mpuIntStatus;     // holds actual interrupt status byte from MPU
+        uint8_t devStatus;        // return status after each device operation (0 = success, !0 = error)
+        uint16_t fifoCount;       // count of all bytes currently in FIFO
+        uint8_t fifoBuffer[64]{}; // FIFO storage buffer
+        
+        // raw data and scaled as vector    原始数据并缩放为向量？
+        float q[4] {1.0f, 0.0f, 0.0f, 0.0f};// for raw filter   过滤器？
+        float Axyz[3]{};
+        float Gxyz[3]{};
+        float Mxyz[3]{};
+        float rawMag[3]{};
+        Quat correction{0, 0, 0, 0};
+
+        // Loop timing globals
+        unsigned long now = 0, last = 0; // micros() timers
+        float deltat = 0;                // loop time in seconds
+
+        SlimeVR::Configuration::QMI8658CalibrationConfig m_Calibration;//保存的校准数据
 };
 
 #endif

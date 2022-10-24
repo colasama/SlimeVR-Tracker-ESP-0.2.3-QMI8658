@@ -246,6 +246,7 @@ void MPU9250Sensor::getMPUScaled()
     #endif
 }
 
+
 void MPU9250Sensor::startCalibration(int calibrationType) {
     ledManager.on();
 #if not (defined(_MAHONY_H_) || defined(_MADGWICK_H_))
